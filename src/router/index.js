@@ -54,7 +54,28 @@ export const constantRoutes = [
       meta: { title: 'Dashboard', icon: 'dashboard' }
     }]
   },
+  {
+    component: Layout,
+    path: '/layout',
+    name: 'Layout',
 
+    redirect: '/layout/layout01',
+    meta: { title: 'Layout', icon: 'example' },
+    children: [
+      {
+        path: 'layout01',
+        name: 'Layout01',
+        component: () => import('@/views/layout/Layout01'),
+        meta: { title: 'Layout01', icon: 'table' }
+      },
+      {
+        path: 'layout02',
+        name: 'Layout02',
+        component: () => import('@/views/layout/Layout02'),
+        meta: { title: 'Layout02', icon: 'table' }
+      }
+    ]
+  },
   {
     path: '/example',
     component: Layout,
@@ -89,7 +110,20 @@ export const constantRoutes = [
       }
     ]
   },
-
+  {
+    path: '/case', 
+    component: Layout,
+    name: 'Case',
+    meta: { title: 'Case', icon: 'example' },
+    children: [
+      {
+        path: 'boxinfo',
+        name: 'BoxInfo',
+        component: () => import('@/views/case/boxinfo'),
+        meta: { title: 'BoxInfo', icon: 'form' }
+      }
+    ]
+  },
   {
     path: '/nested',
     component: Layout,
@@ -158,6 +192,7 @@ export const constantRoutes = [
       }
     ]
   },
+  
 
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
