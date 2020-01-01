@@ -97,7 +97,28 @@ export const constantRoutes = [
       }
     ]
   },
+  {
+    path: '/vue-c3',
+    name: 'vue-c3',
+    //redirect: '/vue-c3/T01',
+    component: Layout,
+    meta: { title: 'vue-c3', icon: 'example' },
 
+    children: [
+      {
+        path: 'T01',
+        name: 'T01',
+        component: () => import('@/views/vue-c3/T01'),
+        meta: { title: 'T01--', icon: 'example' }
+      },
+      {
+        path: 'T02',
+        name: 'T01',
+        component: () => import('@/views/vue-c3/T01'),
+        meta: { title: 'T01--', icon: 'example' }
+      }
+    ]
+  },
   {
     path: '/form',
     component: Layout,
