@@ -96,7 +96,14 @@
                 var ar = ['zero', 'one', 'two', 'three'];
                 ar.shift(); // returns "zero"
                 console.log( ar ); // ["one", "two", "three"]
-            }
+            },
+            '數字轉換'(){
+                let r = {
+                    '二進位':(10).toString(2),
+                    '16進位':(10).toString(16),
+                }
+                return r;
+            },
         }
         
         new Vue({

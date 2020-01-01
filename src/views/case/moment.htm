@@ -86,11 +86,19 @@
     
     <script>
         var test = {
-             
-            'moment 範例'(){ 
-                //
-                return  moment().format('YYYYMMDD_hhmmss');
-            },
+            'format'(){
+                let Now = moment();
+                let arr = [
+                    'YYYYMMDD',
+                    'hhmmss'
+                ]
+                let r  = {Now};
+                for(var idx in arr){
+                    let _f = arr[idx];
+                    r[_f] = Now.format(_f)
+                }
+                return r;
+            }, 
             'moment utc'(){
                 return moment.utc('20190101').toDate();
             },

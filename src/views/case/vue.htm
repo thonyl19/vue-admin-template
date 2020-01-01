@@ -1,0 +1,210 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title></title>
+     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.24.0/moment.min.js"></script>
+    <script type="text/javascript" src="https://unpkg.com/json-fns/json-fns.js"></script>
+    <script type="text/javascript" src="https://npmcdn.com/@reactivex/rxjs@5.0.0-beta.8/dist/global/Rx.umd.js"></script>
+    
+    <!-- <script src="https://cdn.jsdelivr.net/npm/json-beautify@1.1.1/index.min.js"></script> -->
+    <!-- <script src="json-fn.js"></script> -->
+    
+    <style>
+    .flex, .flex dt, .flex dd {
+        width:100%;
+        display: block;
+        padding:0px;
+        margin:0px;
+    }
+    .flex.f-col{
+        flex-flow: column;
+    }
+    .flex.f-row{
+        flex-flow: row;
+    }
+
+    dl.flex {
+        display: flex;
+    }
+    
+    .flex dt 
+    {
+        flex:0;
+    }
+    
+    .flex dd
+    {
+        flex:1;
+    }
+    textarea{
+        width:100%;
+        height:15em;
+    }
+    pre{
+        width:100%;
+        height:100%;
+        background:#20FFA6;
+        margin-top:.5em;
+        overflow-y:auto;
+    }
+    ul {
+        list-style-type:none;
+        margin:0;
+        padding:.3em;
+    }
+    li {
+        min-width:5em;
+        line-height:1.3em;
+        white-space:nowrap;
+    }
+    li:hover{
+        color:blue;
+        font-weight:400;
+        cursor:pointer;
+    }
+ 
+    </style>
+</head>
+<body class="CSBody">
+    <div id="app">
+        <div id="dynamic-component-demo" class="demo">
+            <button
+            v-for="tab in tabsList"
+            v-bind:key="tab"
+            v-bind:class="['tab-button', { active: currentTab === tab }]"
+            v-on:click="currentTab = tab"
+            >{{ tab }}</button>
+    
+            <component
+            v-bind:is="currentTabComponent"
+            class="tab"
+            :sets="currentTab"
+            ></component>
+            <textarea v-model="Code" @blur="change()"></textarea>
+        </div>
+ 
+    </div>
+    
+<script>
+    let views = {
+        "T01": {
+            "template": `<div>test</div>`,
+        },
+
+        destroyed:{
+            "template": "<div>destroyed 測試,當切換到另一個頁籤時觸發.</div>",
+            destroyed(){
+                alert('物件己被銷毀!');
+            }
+        },
+
+        propsCase:{
+            template: `
+            <div>
+                <propsCase_compoment message=\"Welcome to the VueJs Components Tutorial\"></propsCase_compoment>
+            </div>
+            `,
+        },
+
+        propsCase_compoment:{
+            "template": "<h1>{{message}}</h1>",
+            "props": ["message"]
+        },
+
+        rxjs連撃限制:{
+            data(){
+                return {
+                    clicks:0
+                }
+            },
+            "template": "<div>限制點撃每秒只能作用一次,其餘不會觸發<input type=button ref='myButton' value='exec'><div>{{clicks}}</div></div>",
+            mounted(){
+                let _self = this;
+                //Rx.Observable.fromEvent(this.$refs.myButton, 'click')
+                    //.subscribe(_self.exec);
+                let z = Rx.Observable.fromEvent(this.$refs.myButton,'click');
+                    z.throttleTime(1000)
+                //.scan(count => count + 1, 0)
+                .subscribe(_self.exec);
+
+            },
+            methods:{
+                exec(){
+                    this.clicks++;
+                }
+            }
+        },
+        
+        rxjs連續輸入延遲反應:{
+            data(){
+                return {
+                    val:'',
+                    cb_val:'',
+                    keyupObs:null,
+                }
+            },
+            template: `
+                <div>限制點撃每秒只能作用一次,其餘不會觸發
+                    <input type=text ref='myTxt' v-model='val' >
+                <div>當前己輸入值：{{val}} , 1秒後才整個接收的完整值：{{cb_val}}</div></div>
+            `,
+            mounted(){
+                let _self = this;
+                //Rx.Observable.fromEvent(this.$refs.myButton, 'click')
+                    //.subscribe(_self.exec);
+                this.keyupObs = Rx.Observable
+                    .fromEvent(this.$refs.myTxt,'keyup')
+                    .debounceTime(700)
+                    .subscribe(_self.exec);
+            },
+            destroyed(){
+                this.keyupObs.unsubscribe();
+                console.log('keyupObs 註銷',this.keyupObs);
+            },
+            methods:{
+                exec(){
+                    this.cb_val = this.val;
+                }
+            }
+        },
+    }    
+         
+
+    //** # Main
+    for (var k in views){
+        Vue.component(k, views[k]);
+    }
+    let tabsList = Object.keys(views);
+
+    let tabs =  {
+        data: {
+            tabsList,
+            views,
+            "currentTab": "T01",
+            "Code":''
+        },
+        "computed": {
+            currentTabComponent(){
+                var _obj = this.views[this.currentTab];//JSONfns.stringify
+                this.Code
+                    = JSONfns.stringify(_obj, undefined, 4); 
+                    //= beautify(_obj, undefined, 4);
+                return this.currentTab;
+            }
+        
+        },
+        methods: {
+            change(){
+                this.views[this.currentTab].template = this.Code;
+            }
+        },
+        "el": "#app"
+    };
+    Vue.config.productionTip = false
+    new Vue(tabs);
+        
+        
+    </script>
+</body>
+</html>
