@@ -104,6 +104,12 @@
                 }
                 return r;
             },
+            '物件複製'(){
+                var A = {a:1,b:2};
+                var B = {A,c:3};
+                var C = Object.assign({},B);
+                return JSON.stringify(C ,null,2);
+            },
         }
         
         new Vue({
@@ -120,7 +126,13 @@
                     let _fn = this.list[key];
                     var _reg = new RegExp(`(\'|\"|)${key}(\'|\"|)`);
                     this.code =  _fn.toString().replace(_reg,'function');
-                    this.result = JSON.stringify(_fn(), undefined, 4);
+                    
+                    var _result = _fn(); 
+                    this.result 
+                        = typeof(_result) == "string"
+                        ? _result
+                        : JSON.stringify(_result, undefined, 4)
+                        ;
                 },
                 act(){
                     let x = eval(`(${this.code})()`);
